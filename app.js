@@ -176,6 +176,26 @@ def({ id: 'welcome', num: '01', role: 'Todos', title: 'Bienvenida', desc: 'Entra
   </div>`;
 } });
 
+const ROLE_INFO = {
+  owner: { t: 'Dueño de flota', i: 'grid', email: 'dueno@transportes.co', sub: 'Ve el estado de toda tu flota, las alertas y la agenda.' },
+  driver: { t: 'Conductor', i: 'bus', email: 'conductor@transportes.co', sub: 'Revisa tu vehículo antes de salir y reporta novedades.' },
+  shop: { t: 'Taller aliado', i: 'wrench', email: 'taller@aliado.co', sub: 'Diagnostica con datos y envía cotizaciones al dueño.' },
+};
+def({ id: 'login', role: 'Todos', title: 'Ingresar', render() {
+  const r = ROLE_INFO[ui.loginRole || 'owner'];
+  return `<div class="scr dark welcome" style="display:flex;flex-direction:column">
+    <div class="row"><button class="back" data-go="back" aria-label="Volver" style="background:var(--dark-2);border-color:#2f333b;color:#fff">${ic('back')}</button><div class="row b" style="margin-left:4px"><span class="logo sm"></span>Mechanalytics</div></div>
+    <div style="margin:36px 0 22px"><div class="ibox" style="background:var(--blue);color:#fff;width:46px;height:46px;border-radius:12px;margin-bottom:16px">${ic(r.i)}</div>
+      <h1>Ingresar como ${r.t.toLowerCase()}</h1><p>${r.sub}</p></div>
+    <label class="sec-title" style="color:#8a8f99" for="lg-email">Correo</label>
+    <input class="field" id="lg-email" type="email" value="${r.email}" autocomplete="username" style="background:var(--dark-2);border-color:#2f333b;color:#fff;margin-bottom:14px"/>
+    <label class="sec-title" style="color:#8a8f99" for="lg-pass">Contraseña</label>
+    <input class="field" id="lg-pass" type="password" value="demo1234" autocomplete="current-password" style="background:var(--dark-2);border-color:#2f333b;color:#fff"/>
+    <button class="btn btn-primary" data-act="login" style="margin-top:22px">Ingresar</button>
+    <p style="text-align:center;margin:14px 0 0;font-size:12px">Cuenta de prueba precargada · prueba gratis 3 meses</p>
+  </div>`;
+} });
+
 def({ id: 'panel', num: '02', role: 'Dueño', title: 'Panel de flota', desc: 'El estado de toda la flota de un vistazo: salud general, la alerta más urgente y cada vehículo con su estado.', hint: 'Filtra los vehículos, toca uno para abrir su gemelo digital o toca la alerta crítica.', tab: 'panel', render() {
   const vs = S.vehicles;
   const cnt = (s) => vs.filter((v) => v.status === s).length;
@@ -452,7 +472,8 @@ def({ id: 'plan', num: '13', role: 'Dueño', title: 'Plan y suscripción', desc:
       <button class="list-row" data-go="settings" style="width:100%">${ic('settings')}<span class="small" style="flex:1;text-align:left">Ajustes de alertas</span>${ic('chev')}</button>
       <button class="list-row" data-go="link" style="width:100%">${ic('bt')}<span class="small" style="flex:1;text-align:left">Vincular adaptador</span>${ic('chev')}</button>
       <button class="list-row" data-go="pesv" style="width:100%">${ic('file')}<span class="small" style="flex:1;text-align:left">Reporte PESV</span>${ic('chev')}</button>
-      <button class="list-row" data-act="logout" style="width:100%">${ic('logout')}<span class="small" style="flex:1;text-align:left">Cambiar de rol</span>${ic('chev')}</button>
+      <button class="list-row" data-act="resetData" style="width:100%">${ic('history')}<span class="small" style="flex:1;text-align:left">Restablecer datos de prueba</span>${ic('chev')}</button>
+      <button class="list-row" data-act="logout" style="width:100%">${ic('logout')}<span class="small" style="flex:1;text-align:left">Cerrar sesión</span>${ic('chev')}</button>
     </div>
   </div>${tabbar('plan')}`;
 } });
@@ -492,7 +513,7 @@ def({ id: 'report', num: '15', role: 'Conductor', title: 'Reporte del conductor'
 def({ id: 'myreports', num: '·', role: 'Conductor', title: 'Mis reportes', desc: 'Los reportes que ha enviado el conductor y su estado. Pantalla complementaria a la 15.', hint: 'Cada reporte enviado desde “Reportar” aparece aquí.', extra: true, render() {
   return `<div class="scr"><div class="pre">App del conductor · Bus 07</div><div class="h1">Mis reportes</div>
     ${S.driverReports.map((r) => `<div class="card"><div class="row between"><b class="small">${r.what}</b><span class="muted">${r.when}</span></div>${r.note ? `<div class="small" style="color:var(--ink-2);margin-top:6px">${r.note}</div>` : ''}<div style="margin-top:8px"><span class="badge b-green">${ic('check')}${r.status}</span></div></div>`).join('')}
-    <button class="btn btn-ghost" data-act="logout" style="margin-top:6px">${ic('logout')}Cambiar de rol</button>
+    <button class="btn btn-ghost" data-act="logout" style="margin-top:6px">${ic('logout')}Cerrar sesión</button>
   </div>${tabbar('myreports')}`;
 } });
 
@@ -517,23 +538,30 @@ def({ id: 'shop', num: '16', role: 'Taller', title: 'Validación del taller', de
 
 /* ================= navegación ================= */
 const phone = document.getElementById('phone');
-const caption = document.getElementById('caption');
-const list = document.getElementById('screen-list');
 let current = 'welcome', prev = [];
 let liveTimer = null;
 
+const HOME = { owner: 'panel', driver: 'driver', shop: 'shop' };
 const ROLE_OF = { 'Dueño': 'owner', Conductor: 'driver', Taller: 'shop' };
-function go(id, push = true) {
-  if (id === 'back') { id = prev.pop() || 'panel'; push = false; }
+const PUBLIC = ['welcome', 'login'];
+function allowed(id) {
   const s = SCREENS.find((x) => x.id === id);
-  if (!s) return;
-  if (push && current !== id) prev.push(current);
-  if (prev.length > 30) prev = prev.slice(-30);
+  if (!s) return false;
+  if (PUBLIC.includes(id)) return true;
+  return !!S.session && ROLE_OF[s.role] === S.session;
+}
+function go(id, push = true) {
+  if (id === 'back') { history.back(); return; }
+  if (!allowed(id)) id = S.session ? HOME[S.session] : 'welcome';
   current = id;
-  if (ROLE_OF[s.role]) S.role = ROLE_OF[s.role];
-  if (location.hash !== '#/' + id) history.replaceState(null, '', '#/' + id);
+  if (push) history.pushState({ id }, '', '#/' + id); else history.replaceState({ id }, '', '#/' + id);
   render();
 }
+window.addEventListener('popstate', (e) => {
+  const id = (e.state && e.state.id) || location.hash.replace('#/', '') || 'welcome';
+  current = allowed(id) ? id : (S.session ? HOME[S.session] : 'welcome');
+  render();
+});
 
 function render() {
   const s = SCREENS.find((x) => x.id === current);
@@ -542,23 +570,13 @@ function render() {
   phone.innerHTML = s.render();
   phone.dataset.cur = current;
   const n = phone.querySelector('.scr'); if (n) n.scrollTop = keep;
-  const idx = SCREENS.indexOf(s);
-  caption.innerHTML = `<div class="eyebrow">${s.num} · ${s.role}</div><h2>${s.title}</h2><p>${s.desc}</p><div class="hint"><b>Qué puedes probar:</b> ${s.hint}</div>
-    <div class="nav"><button class="btn btn-ghost" data-nav="${idx - 1}" ${idx === 0 ? 'disabled' : ''}>${ic('back')}Anterior</button><button class="btn btn-ghost" data-nav="${idx + 1}" ${idx === SCREENS.length - 1 ? 'disabled' : ''}>Siguiente${ic('chev')}</button></div>
-    <button class="btn btn-dashed" data-act-global="reset" style="margin-top:10px">Reiniciar datos de la demo</button>`;
-  list.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.screen === current));
+  document.title = current === 'welcome' ? 'Mechanalytics' : `${s.title} · Mechanalytics`;
   clearInterval(liveTimer);
   if (current === 'twin') liveTimer = setInterval(() => {
     const v = V(ui.twinVeh), l = twinLive(v);
     for (const k of ['rpm', 'oil', 'bat', 'spd']) { const e = phone.querySelector(`[data-live="${k}"]`); if (e) e.textContent = l[k]; }
     const e2 = phone.querySelector('[data-live="bat2"]'); if (e2) e2.textContent = l.bat + ' V';
   }, 2000);
-}
-
-function buildList() {
-  const groups = {};
-  SCREENS.forEach((s) => (groups[s.role] = groups[s.role] || []).push(s));
-  list.innerHTML = Object.entries(groups).map(([g, arr]) => `<h4>${g}</h4>${arr.map((s) => `<button data-screen="${s.id}"><span>${s.num}</span>${s.title}</button>`).join('')}`).join('');
 }
 
 /* ================= toast & sheets ================= */
@@ -600,8 +618,17 @@ function scheduleSheet({ veh, title, type, alertId }) {
 
 /* ================= acciones ================= */
 const actions = {
-  role(el) { const r = el.dataset.v; S.role = r; save(); go({ owner: 'panel', driver: 'driver', shop: 'shop' }[r]); },
-  logout() { prev = []; go('welcome'); },
+  role(el) { ui.loginRole = el.dataset.v; go('login'); },
+  login() {
+    const em = phone.querySelector('#lg-email').value.trim(), pw = phone.querySelector('#lg-pass').value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return toast('Escribe un correo válido.');
+    if (pw.length < 4) return toast('La contraseña debe tener al menos 4 caracteres.');
+    S.session = ui.loginRole; S.role = ui.loginRole; S.user = em; save();
+    history.replaceState({ id: 'welcome' }, '', '#/welcome');
+    go(HOME[S.session]);
+  },
+  logout() { S.session = null; save(); go('welcome'); },
+  resetData() { if (!confirm('¿Restablecer todos los datos de la cuenta de prueba?')) return; const r = S.session; S = freshState(); S.session = r; save(); toast('Datos restablecidos.'); go(HOME[r]); },
   refSheet() {
     const bg = sheet(`<div class="b" style="font-size:17px">Código de taller aliado</div><div class="muted" style="margin-bottom:12px">Tu taller te dio un código al recomendarte Mechanalytics.</div><input class="field" id="refc" placeholder="Ej.: TALLER-0421" style="text-transform:uppercase"/><button class="btn btn-primary" data-ok style="margin-top:10px">Aplicar código</button>`);
     bg.querySelector('#refc').focus();
@@ -716,110 +743,9 @@ phone.addEventListener('click', (e) => {
   if (a && !a.disabled && actions[a.dataset.act]) actions[a.dataset.act](a);
   if (g && !g.disabled) go(g.dataset.go);
 });
+phone.addEventListener('keydown', (e) => { if (e.key === 'Enter' && current === 'login' && e.target.matches('input')) actions.login(); });
 phone.addEventListener('input', (e) => { const k = e.target.dataset.change; if (k && ['plate', 'repNote', 'qItem', 'qCause'].includes(k)) changes[k](e.target); });
 phone.addEventListener('change', (e) => { const k = e.target.dataset.change; if (k && !['plate', 'repNote', 'qItem', 'qCause'].includes(k)) changes[k](e.target); });
-list.addEventListener('click', (e) => { const b = e.target.closest('[data-screen]'); if (b) go(b.dataset.screen); });
-caption.addEventListener('click', (e) => {
-  const n = e.target.closest('[data-nav]'); if (n && !n.disabled) go(SCREENS[+n.dataset.nav].id);
-  if (e.target.closest('[data-act-global="reset"]')) { S = freshState(); save(); prev = []; toast('Datos de la demo reiniciados'); render(); }
-});
-window.addEventListener('hashchange', () => { const id = location.hash.replace('#/', ''); if (id && id !== current && SCREENS.some((s) => s.id === id)) go(id); });
-
-/* ================= plan financiero ================= */
-const FIN = {
-  months: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-  revenue: [6.5, 13, 19.5, 25.8, 32.1, 38.3, 44.5, 50.6, 56.6, 62.6, 68.6, 74.4],
-  direct: [2.1, 3.7, 5.3, 6.9, 8.4, 10, 11.5, 13, 14.5, 16, 17.4, 18.9],
-  net: [-14.1, -9.3, -4.5, 0.3, 5, 9.7, 13.8, 12.3, 15.3, 18.2, 21.1, 24],
-  cash: [6.1, -4.1, -9.3, -9.8, -5.5, 3.5, 17.2, 35.4, 58.2, 85.5, 117.3, 154.3],
-  tiers: [['Tier 1 · 1–2 veh.', 73.7, 82, '#1d4ed8'], ['Tier 2 · 3–8 veh.', 96.3, 80, '#0d9488'], ['Tier 3 · 9–15 veh.', 78.4, 77, '#a855f7'], ['Tier 4 · 15–30 veh.', 136.9, 76, '#d97706']],
-};
-const M = (v) => `COP ${v.toLocaleString('es-CO', { maximumFractionDigits: 1 })} M`;
-
-function barsChart() {
-  const W = 640, H = 260, L = 44, R = 10, T = 10, B = 26, max = 80;
-  const n = 12, gw = (W - L - R) / n, bw = (gw - 10) / 2;
-  const y = (v) => T + (1 - v / max) * (H - T - B);
-  let s = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ingresos y costos directos mensuales 2027">`;
-  for (let t = 0; t <= max; t += 20) s += `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
-  FIN.months.forEach((m, i) => {
-    const x0 = L + i * gw + 4;
-    const bar = (v, x, c, lbl) => { const h = y(0) - y(v); return `<path d="M${x},${y(0)} v${-(h - 4)} q0,-4 4,-4 h${bw - 8} q4,0 4,4 v${h - 4} z" fill="${c}" data-tip="${lbl} · ${m} 2027: ${M(v)}"/>`; };
-    s += bar(FIN.revenue[i], x0, '#1d4ed8', 'Ingresos') + bar(FIN.direct[i], x0 + bw + 2, '#0d9488', 'Costos directos');
-    s += `<text x="${x0 + bw}" y="${H - 8}" text-anchor="middle">${m}</text>`;
-  });
-  s += `<text x="${L + 11 * gw + 4 + bw / 2}" y="${y(74.4) - 6}" text-anchor="middle" style="fill:var(--ink);font-weight:600">74,4</text>`;
-  return s + '</svg>';
-}
-
-function lineChart(data, label, opts = {}) {
-  const W = 640, H = 230, L = 44, R = 14, T = 14, B = 26;
-  const min = opts.min, max = opts.max;
-  const x = (i) => L + (i / 11) * (W - L - R);
-  const y = (v) => T + (1 - (v - min) / (max - min)) * (H - T - B);
-  let s = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">`;
-  for (const t of opts.ticks) s += `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="${t === 0 ? 'var(--ink-3)' : 'var(--line)'}"/><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
-  const pts = data.map((v, i) => `${x(i)},${y(v)}`).join(' ');
-  s += `<polygon points="${x(0)},${y(0)} ${pts} ${x(11)},${y(0)}" fill="#1d4ed8" opacity=".08"/>`;
-  s += `<polyline points="${pts}" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>`;
-  data.forEach((v, i) => { s += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${v < 0 ? 'var(--red)' : '#1d4ed8'}" stroke="var(--surface)" stroke-width="2"/><rect x="${x(i) - 22}" y="${T}" width="44" height="${H - T - B}" fill="transparent" data-tip="${label} · ${FIN.months[i]} 2027: ${M(v)}"/>`; s += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${FIN.months[i]}</text>`; });
-  if (opts.annot) s += opts.annot(x, y);
-  return s + '</svg>';
-}
-
-function renderFinance() {
-  const el = document.getElementById('view-finance');
-  const maxT = Math.max(...FIN.tiers.map((t) => t[1]));
-  el.innerHTML = `
-    <div class="eyebrow">Plan financiero · proyección 2027</div>
-    <h1>De piloto a flujo positivo en seis meses</h1>
-    <p class="lead">Cifras del plan empresarial de MechaAnalytics (noviembre 2026). Los ingresos crecen cada mes por el efecto de red de los talleres aliados; la caja toca su punto más bajo en el primer trimestre y se cubre con un crédito de COP 17,7 M y el aporte en trabajo de los socios.</p>
-    <div class="kpis">
-      <div class="kpi"><div class="l">Ingresos 2027</div><div class="v">COP 492,6 M</div><div class="s">De COP 6,5 M en enero a 74,4 M en diciembre</div></div>
-      <div class="kpi"><div class="l">Utilidad bruta</div><div class="v">COP 365 M</div><div class="s">Margen bruto del 74 %</div></div>
-      <div class="kpi"><div class="l">Utilidad neta</div><div class="v">COP 92 M</div><div class="s">19 % de los ingresos · positiva desde abril</div></div>
-      <div class="kpi"><div class="l">Caja a diciembre</div><div class="v">COP 154,3 M</div><div class="s">Punto más bajo: −9,8 M en abril</div></div>
-    </div>
-    <div class="fgrid">
-      <div class="panel"><h3>Ingresos vs. costos directos por mes</h3><p class="sub">Millones de COP · 2027</p><div class="legend"><span><i style="background:#1d4ed8"></i>Ingresos</span><span><i style="background:#0d9488"></i>Costos directos (incluye adaptadores OBD-II)</span></div>${barsChart()}</div>
-      <div class="panel"><h3>Estado de resultados 2027</h3><p class="sub">Millones de COP</p><table class="ftable">
-        ${[['Ingresos', '492,6'], ['Costos directos', '(127,7)'], ['Utilidad bruta', '365,0'], ['Salarios y honorarios', '(120,0)'], ['Marketing y pauta digital', '(72,0)'], ['Suscripciones de software', '(18,0)'], ['Honorarios profesionales', '(12,0)'], ['Ingreso operativo', '143,0'], ['Intereses', '(1,5)'], ['Impuesto de renta', '(49,5)']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}
-        <tr class="tot"><td>Utilidad neta</td><td>92,0</td></tr></table></div>
-    </div>
-    <div class="fgrid">
-      <div class="panel"><h3>Caja al cierre de cada mes</h3><p class="sub">Millones de COP · el saldo negativo de feb–may se cubre con el crédito y el capital semilla</p>${lineChart(FIN.cash, 'Caja', { min: -20, max: 160, ticks: [0, 40, 80, 120, 160], annot: (x, y) => `<text x="${x(3)}" y="${y(-9.8) - 10}" text-anchor="middle" style="fill:var(--red);font-weight:600">−9,8 (abr)</text><text x="${x(11) - 4}" y="${y(154.3) - 10}" text-anchor="end" style="fill:var(--ink);font-weight:600">154,3</text>` })}</div>
-      <div class="panel"><h3>Ingresos por nivel de suscripción</h3><p class="sub">Total 2027 y margen bruto de cada tier · Tier 5 (30+ vehículos) sin ingresos proyectados</p>
-        <div class="tierbars">${FIN.tiers.map(([n, v, m, c]) => `<div class="tb"><div class="row between"><span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-right:6px"></i>${n}</span><b>${M(v)}</b></div><div class="bar"><i style="width:${(v / maxT) * 100}%;background:${c}" data-tip="${n}: ${M(v)} · margen ${m} %"></i></div><div class="muted" style="margin-top:4px">Margen bruto ${m} %</div></div>`).join('')}</div></div>
-    </div>
-    <div class="fgrid">
-      <div class="panel"><h3>Utilidad neta mensual</h3><p class="sub">Millones de COP · pasa a positiva en abril (punto de equilibrio)</p>${lineChart(FIN.net, 'Utilidad neta', { min: -20, max: 30, ticks: [-20, -10, 0, 10, 20, 30], annot: (x, y) => `<text x="${x(3)}" y="${y(0.3) - 12}" text-anchor="middle" style="fill:var(--ink);font-weight:600">Equilibrio</text>` })}</div>
-      <div class="panel"><h3>Origen y uso de los fondos</h3><p class="sub">Supuestos del plan</p><table class="ftable">
-        <tr><td>Crédito a largo plazo</td><td>COP 17,7 M</td></tr><tr><td>Déficit máximo estimado (mar 2027)</td><td>COP −17,8 M</td></tr><tr><td>Ahorro por aporte en trabajo de los socios</td><td>&gt; COP 15 M / mes</td></tr><tr><td>Presupuesto de marketing</td><td>COP 6 M / mes</td></tr><tr><td>Líder de ventas B2B</td><td>COP 48 M / año</td></tr><tr><td>Comisión a talleres por referido</td><td>10 % anual</td></tr><tr><td>Adaptadores incluidos sin costo</td><td>Hasta 30 por flota</td></tr><tr><td>Prueba gratuita</td><td>3 meses</td></tr></table></div>
-    </div>
-    <div class="panel"><h3>Hitos</h3><p class="sub">Según el roadmap del plan</p><div class="milestones">
-      <div class="ms"><b>Piloto con 5 flotas en Bogotá</b><span>1 de enero de 2027</span></div>
-      <div class="ms"><b>Alertas predictivas automatizadas</b><span>1 de abril de 2027</span></div>
-      <div class="ms"><b>Expansión a Medellín</b><span>1 de septiembre de 2027</span></div></div></div>`;
-}
-
-const tip = document.createElement('div'); tip.className = 'tip'; document.body.appendChild(tip);
-document.getElementById('view-finance').addEventListener('mousemove', (e) => {
-  const t = e.target.closest('[data-tip]');
-  if (!t) { tip.style.opacity = 0; return; }
-  tip.textContent = t.dataset.tip; tip.style.opacity = 1;
-  tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = e.clientY - 36 + 'px';
-});
-
-document.querySelectorAll('.mode').forEach((b) => b.addEventListener('click', () => {
-  document.querySelectorAll('.mode').forEach((x) => x.classList.toggle('active', x === b));
-  const fin = b.dataset.mode === 'finance';
-  document.getElementById('view-app').hidden = fin;
-  document.getElementById('view-finance').hidden = !fin;
-  if (fin && !document.getElementById('view-finance').innerHTML) renderFinance();
-  window.scrollTo(0, 0);
-}));
-
 /* ================= arranque ================= */
-buildList();
 const start = location.hash.replace('#/', '');
-go(SCREENS.some((s) => s.id === start) ? start : 'welcome', false);
+go(allowed(start) ? start : (S.session ? HOME[S.session] : 'welcome'), false);

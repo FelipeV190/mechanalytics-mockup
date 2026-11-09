@@ -4,18 +4,19 @@ Mockup navegable de **Mechanalytics**, mantenimiento predictivo para flotas medi
 
 Lo construimos a partir de los mockups de la aplicación (16 pantallas) y del plan empresarial de noviembre de 2026.
 
-## Qué incluye
+## Cómo se usa
 
-- **App** con las 16 pantallas de los mockups y sus tres roles: dueño de flota, conductor y taller aliado.
-  - Panel de flota con filtros, gemelo digital con datos en vivo simulados, predicciones con gráfica de tendencia y diagnóstico de fallas.
-  - Alertas con acciones reales: agendar en la agenda, ver diagnóstico y aprobar cotizaciones.
-  - Historial técnico por vehículo y origen, reporte PESV imprimible a PDF, ajustes de alertas y vinculación del adaptador en 3 pasos.
-  - Plan y suscripción con los 5 tiers del plan financiero, prueba de 3 meses y hasta 30 adaptadores incluidos por flota.
-  - Inspección preoperacional y reporte de novedades del conductor; cotización del taller con total automático.
-  - Los flujos están conectados: el reporte del conductor llega a las alertas del dueño, y la cotización del taller se aprueba desde Alertas, lo que habilita borrar el código de falla.
-- **Plan financiero**: proyección 2027 (ingresos, costos, caja, utilidad neta, ingresos por tier, fondos e hitos).
+La app abre en la pantalla de bienvenida. Eliges un rol (dueño de flota, conductor o taller aliado) e inicias sesión con la cuenta de prueba que ya viene precargada. Cada rol ve solo su parte de la app y puede cerrar sesión desde su cuenta.
 
-El estado de la demo se guarda en el navegador (`localStorage`) y se puede reiniciar desde el botón "Reiniciar datos de la demo".
+- **Dueño de flota**: panel de flota, gemelo digital con datos en vivo, predicciones, diagnóstico de fallas, alertas, agenda de mantenimiento, historial técnico, reporte PESV, ajustes de alertas, vincular adaptador y plan de suscripción.
+- **Conductor**: inspección preoperacional, reporte de novedades y sus reportes enviados.
+- **Taller aliado**: diagnóstico con los datos del vehículo y cotización para el dueño.
+
+Los tres roles comparten los datos: el reporte del conductor le llega al dueño en Alertas, y la cotización del taller se aprueba desde Alertas, lo que habilita borrar el código de falla.
+
+Del plan financiero, la app usa los 5 tiers de suscripción, la prueba gratis de 3 meses, los 3 meses gratis en la contratación anual, hasta 30 adaptadores incluidos por flota y la comisión del 10 % para los talleres.
+
+Los datos se guardan en el navegador (`localStorage`) y se pueden restablecer desde Cuenta → "Restablecer datos de prueba".
 
 ## Ejecutar
 
