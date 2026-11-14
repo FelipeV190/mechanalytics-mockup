@@ -419,7 +419,7 @@ def({ id: 'pesv', num: '10', role: 'Dueño', title: 'Reporte PESV', desc: 'Vista
     ${header('Reporte PESV', 'Vista previa del documento', '', 'history')}
     <div class="card" id="pesv-doc" style="box-shadow:0 8px 24px -12px rgba(0,0,0,.2)">
       <div class="row between"><div class="row b">${'<span class="logo sm"></span>'}Mechanalytics</div><span class="muted">${d[5]}</span></div>
-      <div class="b" style="font-size:16px;margin-top:12px">Gestión de vehículos seguros</div><div class="muted">Transportes Javeriana · 12 vehículos · NIT [NÚMERO]</div>
+      <div class="b" style="font-size:16px;margin-top:12px">Gestión de vehículos seguros</div><div class="muted">Transportes Javeriana · 12 vehículos · NIT 12121212</div>
       <div style="margin-top:8px">${[['Mantenimientos realizados', d[0]], ['Fallas detectadas por el adaptador', d[1]], ['Alertas atendidas', d[2]], ['Reportes de conductores', d[3]], ['Vehículos con historial completo', d[4]]].map(([a, b]) => `<div class="list-row small"><span style="flex:1">${a}</span><b>${b}</b></div>`).join('')}</div>
       <div class="row small" style="color:var(--green);font-weight:600;margin-top:8px">${ic('shield')}Cada registro con fecha, hora y origen</div>
     </div>
@@ -472,7 +472,7 @@ def({ id: 'plan', num: '13', role: 'Dueño', title: 'Plan y suscripción', desc:
       <div class="muted" style="margin-top:4px">Precio por flota · IVA no incluido · adaptadores incluidos en la suscripción</div>
       ${p.billing === 'Anual' ? `<div class="small" style="color:var(--green);font-weight:600;margin-top:6px">Contratación anual: pagas 9 meses y recibes 12 (3 meses gratis).${cur[2] ? ` Ahorras ${fmtCOP(cur[2] * 3)} en tu plan.` : ''}</div>` : ''}</div>
     <div class="card row"><div class="ibox" style="background:var(--blue-soft);color:var(--blue)">${ic('bt')}</div><div style="flex:1"><div class="b small">${p.adapters} adaptadores asignados</div><div class="muted">Incluidos sin costo hasta 30 por flota; desde el 31 se pagan una sola vez</div></div><button class="link" data-act="moreAdapters">Pedir más ›</button></div>
-    <div class="card row"><div class="ibox" style="background:var(--green-soft);color:var(--green)">${ic('user')}</div><div style="flex:1"><div class="b small">Tu asesor: [NOMBRE]</div><div class="muted">Éxito del cliente · llegaste por ${S.referral ? 'código ' + S.referral : 'JaveTaller'}</div></div><button class="link" data-act="toast" data-v="Abriendo chat con tu asesor…">Escribir ›</button></div>
+    <div class="card row"><div class="ibox" style="background:var(--green-soft);color:var(--green)">${ic('user')}</div><div style="flex:1"><div class="b small">Tu asesor: Miguel</div><div class="muted">Éxito del cliente · llegaste por ${S.referral ? 'código ' + S.referral : 'JaveTaller'}</div></div><button class="link" data-act="toast" data-v="Abriendo chat con tu asesor…">Escribir ›</button></div>
     <div class="card" style="padding:4px 14px">
       <button class="list-row" data-go="settings" style="width:100%">${ic('settings')}<span class="small" style="flex:1;text-align:left">Ajustes de alertas</span>${ic('chev')}</button>
       <button class="list-row" data-go="link" style="width:100%">${ic('bt')}<span class="small" style="flex:1;text-align:left">Vincular adaptador</span>${ic('chev')}</button>
