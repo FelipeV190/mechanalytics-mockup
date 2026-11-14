@@ -208,7 +208,7 @@ def({ id: 'panel', num: '02', role: 'Dueño', title: 'Panel de flota', desc: 'El
   list = [...list].sort((a, b) => order[a.status] - order[b.status]);
   const crit = S.alerts.find((a) => a.kind === 'crit');
   return `<div class="scr">
-    <div class="row between"><div><div class="pre">Transportes [NOMBRE] · ${vs.length} vehículos</div><div class="h1" style="margin-bottom:12px">Mi flota</div></div>
+    <div class="row between"><div><div class="pre">Transportes Javeriana · ${vs.length} vehículos</div><div class="h1" style="margin-bottom:12px">Mi flota</div></div>
       <button class="back" data-go="alerts" aria-label="Alertas" style="position:relative">${ic('bell')}${unreadCount() ? '<i style="position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--red)"></i>' : ''}</button></div>
     <div class="card row" style="gap:16px">${gauge(health)}<div style="flex:1"><div class="b small">Salud de la flota</div>
       <div class="row" style="gap:18px;margin-top:6px"><div><div class="num">${cnt('ok')}</div><div class="muted">Operando</div></div><div><div class="num" style="color:var(--orange)">${cnt('warn') + cnt('crit')}</div><div class="muted">Atención</div></div><div><div class="num">${cnt('off')}</div><div class="muted">Sin señal</div></div></div></div></div>
@@ -387,7 +387,7 @@ def({ id: 'agenda', num: '08', role: 'Dueño', title: 'Agenda de mantenimiento',
     <div class="days">${days.map(([l, n]) => { const j = jobs.find((x) => x.day === n); return `<button class="day ${ui.day === n ? 'on' : ''}" data-act="day" data-v="${n}">${l}<b>${n}</b>${j ? `<i style="background:${dc[j.type]}"></i>` : ''}</button>`; }).join('')}</div>
     <div class="row" style="gap:8px;margin-bottom:12px"><div class="card" style="flex:1;margin:0"><div class="num">${jobs.length}</div><div class="muted">Trabajos esta semana</div></div><div class="card" style="flex:1;margin:0"><div class="num">${jobs.filter((j) => j.type !== 'Kilometraje').length}</div><div class="muted">Salieron de una predicción o diagnóstico</div></div></div>
     <div class="row between"><div class="b">${ui.day ? `Programado · ${dn[ui.day]} ${ui.day}` : 'Programado'}</div>${ui.day ? '<button class="link" data-act="dayAll">Ver semana</button>' : ''}</div>
-    <div style="margin-top:10px">${shown.length ? shown.map((j) => { const v = V(j.veh); return `<div class="card"><div class="row between"><span class="muted">${dn[j.day]} ${j.day} · ${j.time}</span><span class="badge ${tc[j.type]}">${j.type}</span></div><div class="b" style="margin:6px 0 2px">${j.title}</div><div class="muted">${v.name} · ${v.plate} · [TALLER ALIADO]</div></div>`; }).join('') : '<div class="card muted" style="text-align:center">Nada programado este día.</div>'}</div>
+    <div style="margin-top:10px">${shown.length ? shown.map((j) => { const v = V(j.veh); return `<div class="card"><div class="row between"><span class="muted">${dn[j.day]} ${j.day} · ${j.time}</span><span class="badge ${tc[j.type]}">${j.type}</span></div><div class="b" style="margin:6px 0 2px">${j.title}</div><div class="muted">${v.name} · ${v.plate} · JaveTaller</div></div>`; }).join('') : '<div class="card muted" style="text-align:center">Nada programado este día.</div>'}</div>
   </div>${tabbar('history')}`;
 } });
 
@@ -419,7 +419,7 @@ def({ id: 'pesv', num: '10', role: 'Dueño', title: 'Reporte PESV', desc: 'Vista
     ${header('Reporte PESV', 'Vista previa del documento', '', 'history')}
     <div class="card" id="pesv-doc" style="box-shadow:0 8px 24px -12px rgba(0,0,0,.2)">
       <div class="row between"><div class="row b">${'<span class="logo sm"></span>'}Mechanalytics</div><span class="muted">${d[5]}</span></div>
-      <div class="b" style="font-size:16px;margin-top:12px">Gestión de vehículos seguros</div><div class="muted">Transportes [NOMBRE] · 12 vehículos · NIT [NÚMERO]</div>
+      <div class="b" style="font-size:16px;margin-top:12px">Gestión de vehículos seguros</div><div class="muted">Transportes Javeriana · 12 vehículos · NIT [NÚMERO]</div>
       <div style="margin-top:8px">${[['Mantenimientos realizados', d[0]], ['Fallas detectadas por el adaptador', d[1]], ['Alertas atendidas', d[2]], ['Reportes de conductores', d[3]], ['Vehículos con historial completo', d[4]]].map(([a, b]) => `<div class="list-row small"><span style="flex:1">${a}</span><b>${b}</b></div>`).join('')}</div>
       <div class="row small" style="color:var(--green);font-weight:600;margin-top:8px">${ic('shield')}Cada registro con fecha, hora y origen</div>
     </div>
@@ -465,14 +465,14 @@ const tierPrice = (i, billing) => { const m = TIERS[i][2]; if (m == null) return
 def({ id: 'plan', num: '13', role: 'Dueño', title: 'Plan y suscripción', desc: 'Prueba gratuita, nivel de suscripción según el tamaño de la flota, adaptadores incluidos y asesor asignado.', hint: 'Precios por flota del plan empresarial (14-nov-2026), sin IVA. Cambia entre Mensual y Anual para ver el ahorro de los 3 meses gratis.', tab: 'plan', render() {
   const p = S.plan, cur = TIERS[p.tier - 1];
   return `<div class="scr">
-    <div class="pre">Cuenta · Transportes [NOMBRE]</div><div class="h1">Mi plan</div>
+    <div class="pre">Cuenta · Transportes Javeriana</div><div class="h1">Mi plan</div>
     <div class="card" style="background:var(--dark);color:#fff"><div class="row between"><b>Prueba gratuita</b><span style="font-size:12px;color:#b8bcc4">Quedan 72 de 90 días</span></div><div class="bar" style="background:#3a3e46;height:5px;margin:10px 0"><i style="width:20%;background:#8fa8f5"></i></div><div style="font-size:12px;color:#b8bcc4">Al terminar, tu flota pasa al ${cur[0]}${cur[2] ? ` · ${fmtCOP(cur[2])}/mes` : ''}. Puedes cambiarlo cuando quieras.</div></div>
     <div class="card"><div class="row between" style="margin-bottom:10px"><div><div class="b small">Suscripción por flota</div><div class="muted">${S.vehicles.length} vehículos · adaptadores incluidos</div></div><div class="seg2">${['Mensual', 'Anual'].map((b) => `<button class="${p.billing === b ? 'on' : ''}" data-act="billing" data-v="${b}">${b}</button>`).join('')}</div></div>
       ${TIERS.map(([t, r], i) => `<button class="tier ${p.tier === i + 1 ? 'on' : ''}" data-act="tier" data-v="${i + 1}"><div><b>${t}</b>${p.tier === i + 1 ? ' <span class="badge" style="background:var(--blue);color:#fff">Tu plan</span>' : ''}<div class="muted">${r}</div></div><span class="p">${tierPrice(i, p.billing)}</span></button>`).join('')}
       <div class="muted" style="margin-top:4px">Precio por flota · IVA no incluido · adaptadores incluidos en la suscripción</div>
       ${p.billing === 'Anual' ? `<div class="small" style="color:var(--green);font-weight:600;margin-top:6px">Contratación anual: pagas 9 meses y recibes 12 (3 meses gratis).${cur[2] ? ` Ahorras ${fmtCOP(cur[2] * 3)} en tu plan.` : ''}</div>` : ''}</div>
     <div class="card row"><div class="ibox" style="background:var(--blue-soft);color:var(--blue)">${ic('bt')}</div><div style="flex:1"><div class="b small">${p.adapters} adaptadores asignados</div><div class="muted">Incluidos sin costo hasta 30 por flota; desde el 31 se pagan una sola vez</div></div><button class="link" data-act="moreAdapters">Pedir más ›</button></div>
-    <div class="card row"><div class="ibox" style="background:var(--green-soft);color:var(--green)">${ic('user')}</div><div style="flex:1"><div class="b small">Tu asesor: [NOMBRE]</div><div class="muted">Éxito del cliente · llegaste por ${S.referral ? 'código ' + S.referral : '[TALLER ALIADO]'}</div></div><button class="link" data-act="toast" data-v="Abriendo chat con tu asesor…">Escribir ›</button></div>
+    <div class="card row"><div class="ibox" style="background:var(--green-soft);color:var(--green)">${ic('user')}</div><div style="flex:1"><div class="b small">Tu asesor: [NOMBRE]</div><div class="muted">Éxito del cliente · llegaste por ${S.referral ? 'código ' + S.referral : 'JaveTaller'}</div></div><button class="link" data-act="toast" data-v="Abriendo chat con tu asesor…">Escribir ›</button></div>
     <div class="card" style="padding:4px 14px">
       <button class="list-row" data-go="settings" style="width:100%">${ic('settings')}<span class="small" style="flex:1;text-align:left">Ajustes de alertas</span>${ic('chev')}</button>
       <button class="list-row" data-go="link" style="width:100%">${ic('bt')}<span class="small" style="flex:1;text-align:left">Vincular adaptador</span>${ic('chev')}</button>
@@ -488,7 +488,7 @@ def({ id: 'driver', num: '14', role: 'Conductor', title: 'Inicio del conductor',
   const c = S.checklist, done = c.filter(Boolean).length;
   const crit = V('bus07').status === 'crit';
   return `<div class="scr">
-    <div class="pre">App del conductor · Bus 07 · WFN 482</div><div class="h1">Hola, [NOMBRE]</div>
+    <div class="pre">App del conductor · Bus 07 · WFN 482</div><div class="h1">Hola, Felipe</div>
     ${crit ? `<div class="card" style="background:var(--orange-soft)"><div class="row b small" style="color:#7a3b06">${ic('alert')}Revisa la temperatura hoy</div><div class="small" style="color:#7a3b06;margin-top:6px;line-height:1.45">El motor se está calentando más rápido de lo normal. Si ves el testigo, detente y repórtalo.</div></div>` : `<div class="card" style="background:var(--green-soft)"><div class="row b small" style="color:var(--green)">${ic('check')}Tu vehículo está listo para salir</div></div>`}
     <div class="card"><div class="sec-title">Verificado por el adaptador</div><div class="chips" style="margin:0"><span class="badge b-green">Batería OK</span><span class="badge b-green">Sin códigos</span><span class="badge ${crit ? 'b-orange' : 'b-green'}">Temperatura</span><span class="badge b-green">Kilometraje</span></div></div>
     <div class="card"><div class="row between"><b class="small">Inspección preoperacional</b><span class="muted">${done} de 6</span></div>
@@ -526,7 +526,7 @@ def({ id: 'shop', num: '16', role: 'Taller', title: 'Validación del taller', de
   const q = S.quote, total = q.items.reduce((a, [, v]) => a + (+v || 0), 0);
   const st = { draft: ['Borrador · sin enviar', 'var(--ink-3)'], sent: ['Pendiente de aprobación del dueño', 'var(--orange)'], approved: ['Aprobada por el dueño', 'var(--green)'] }[q.status];
   return `<div class="scr">
-    ${header('[NOMBRE DEL TALLER]', 'Vista del taller aliado', '', 'welcome')}
+    ${header('JaveTaller', 'Vista del taller aliado', '', 'welcome')}
     <div class="h1" style="font-size:20px;margin-bottom:2px">Diagnóstico con datos</div><div class="muted" style="margin-bottom:12px">Bus 07 · WFN 482 · el dueño ve esta misma información</div>
     <div class="card"><div class="sec-title">Lo que registró el vehículo</div><div class="row between small"><b>P0217 · Sobretemperatura</b><span class="muted">6 nov · 14:28</span></div>
       <div class="row" style="gap:6px;margin:10px 0">${[['112 °C', 'Pico'], ['16 min', 'Sobre 100 °C'], [String(S.driverReports.length), 'Reporte cond.']].map(([a, b]) => `<div style="flex:1;background:var(--app-bg);border-radius:8px;padding:8px"><div class="b">${a}</div><div class="muted">${b}</div></div>`).join('')}</div>
@@ -605,7 +605,7 @@ function scheduleSheet({ veh, title, type, alertId }) {
   const times = ['7:00 a. m.', '10:00 a. m.', '2:00 p. m.', '4:00 p. m.'];
   const existing = S.jobs.find((j) => j.veh === veh && j.title === title);
   let d = existing ? existing.day : 11, t = existing ? existing.time : times[0];
-  const bg = sheet(`<div class="b" style="font-size:17px">${existing ? 'Reprogramar' : 'Agendar'}: ${title}</div><div class="muted" style="margin-bottom:14px">${v.name} · ${v.plate} · [TALLER ALIADO]</div>
+  const bg = sheet(`<div class="b" style="font-size:17px">${existing ? 'Reprogramar' : 'Agendar'}: ${title}</div><div class="muted" style="margin-bottom:14px">${v.name} · ${v.plate} · JaveTaller</div>
     <div class="sec-title">Día</div><div class="chips" data-g="d">${days.map(([l, n]) => `<button class="chip ${n === d ? 'on' : ''}" data-d="${n}">${l} ${n}</button>`).join('')}</div>
     <div class="sec-title">Hora</div><div class="chips" data-g="t">${times.map((x) => `<button class="chip ${x === t ? 'on' : ''}" data-t="${x}">${x}</button>`).join('')}</div>
     <button class="btn btn-primary" data-ok style="margin-top:8px">Confirmar</button><button class="btn" data-close style="margin-top:4px;color:var(--ink-3)">Cancelar</button>`);

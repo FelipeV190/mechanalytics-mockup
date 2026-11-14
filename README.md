@@ -36,4 +36,4 @@ Es un sitio estático sin dependencias: abre `index.html` o sírvelo con cualqui
 npx serve .
 ```
 
-Los textos entre corchetes (`[NOMBRE]`, `[TALLER ALIADO]`) son datos que el plan todavía no define.
+Los textos entre corchetes (`[NOMBRE]` del asesor, `[NÚMERO]` del NIT) son datos que el plan todavía no define.
