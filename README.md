@@ -14,7 +14,17 @@ La app abre en la pantalla de bienvenida. Eliges un rol (dueño de flota, conduc
 
 Los tres roles comparten los datos: el reporte del conductor le llega al dueño en Alertas, y la cotización del taller se aprueba desde Alertas, lo que habilita borrar el código de falla.
 
-Del plan financiero, la app usa los 5 tiers de suscripción, la prueba gratis de 3 meses, los 3 meses gratis en la contratación anual, hasta 30 adaptadores incluidos por flota y la comisión del 10 % para los talleres.
+Del plan financiero (versión del 14 de noviembre de 2026), la app usa los 5 tiers de suscripción con su precio mensual por flota, la prueba gratis de 3 meses, los 3 meses gratis en la contratación anual (se pagan 9 de 12 meses), hasta 30 adaptadores incluidos por flota y la comisión del 10 % de la suscripción anual para los talleres.
+
+| Tier | Flota | Mensual (sin IVA) | Anual (9 meses) |
+|---|---|---|---|
+| Tier 1 | 1–2 vehículos | COP 245.000 | COP 2.205.000 |
+| Tier 2 | 3–8 vehículos | COP 640.000 | COP 5.760.000 |
+| Tier 3 | 9–15 vehículos | COP 1.042.500 | COP 9.382.500 |
+| Tier 4 | 15–30 vehículos | COP 1.820.000 | COP 16.380.000 |
+| Tier 5 | 30+ vehículos | A convenir | A convenir |
+
+El plan no publica una tabla de precios; estos valores salen de las proyecciones del apéndice (ingreso del primer mes de cada tier, que crece una flota al mes con 1 % de abandono). El Tier 5 no tiene ventas proyectadas en 2027.
 
 Los datos se guardan en el navegador (`localStorage`) y se pueden restablecer desde Cuenta → "Restablecer datos de prueba".
 
@@ -26,4 +36,4 @@ Es un sitio estático sin dependencias: abre `index.html` o sírvelo con cualqui
 npx serve .
 ```
 
-Los textos entre corchetes (`[NOMBRE]`, `[PRECIO]`, `[TALLER ALIADO]`) son datos que el plan todavía no define.
+Los textos entre corchetes (`[NOMBRE]`, `[TALLER ALIADO]`) son datos que el plan todavía no define.

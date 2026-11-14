@@ -174,7 +174,8 @@ textarea.field { resize: none; min-height: 70px; font-size: 13px; }
 /* tiers */
 .tier { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; font-size: 13px; width: 100%; text-align: left; }
 .tier.on { border-color: var(--blue); background: var(--blue-soft); }
-.tier .p { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tier .p { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+.tier .p small { font-weight: 400; color: var(--ink-3); }
 .seg2 { display: inline-flex; background: var(--gray-soft); border-radius: 8px; padding: 2px; }
 .seg2 button { padding: 5px 10px; border-radius: 6px; font-size: 12px; color: var(--ink-3); }
 .seg2 button.on { background: var(--surface); color: var(--ink); font-weight: 600; }
